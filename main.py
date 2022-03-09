@@ -1,13 +1,13 @@
 eElec = 50e-09
-eFs = 10e-12
-packetSize = 400
-d = 100
+eFs = 100e-12
+packetSize = 500*8
+d = 80
 eTX = (eElec*packetSize)+(eFs*packetSize*(d**2))
 eRX = eElec*packetSize
 saludoSize = 100
 saludoTx = (eElec*saludoSize)+(eFs*saludoSize*(d**2))
 saludoRx = eElec*saludoSize
-n_nodos = [1,1,2,4,8]
+n_nodos = [3,3,6,12,16]
 e_inicial = 5
 paquetes = 0
 coronas = []
