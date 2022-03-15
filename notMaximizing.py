@@ -4,10 +4,10 @@ packetSize = 500*8
 d = 80
 eTX = (eElec*packetSize)+(eFs*packetSize*(d**2))
 eRX = eElec*packetSize
-saludoSize = 100
+saludoSize = 25
 saludoTx = (eElec*saludoSize)+(eFs*saludoSize*(d**2))
 saludoRx = eElec*saludoSize
-n_nodos = [3,3,6,12,16]
+n_nodos = [3,3,6,12,20]
 e_inicial = 5
 paquetes = 0
 coronas = []
@@ -21,20 +21,52 @@ class Corona:
 for n in n_nodos:
     coronas.append(Corona(n))
 
+suma = 0
+for corona in coronas:
+    suma += corona.bateria
+print(suma)
+
 def ciclo():
     global paquetes
     global condicion
     for c in range(len(coronas)):
         if c == 0:
+            # Cada nodo de la corona más exterior (0) envía un Hello
             coronas[c].bateria -= saludoTx*coronas[c].nodos
+            # En la corona 0 se recibe un Hello por cada nodo en la corona 1
             coronas[c].bateria -= saludoRx*coronas[c+1].nodos
+            # Cada nodo de la corona 0 envía un paquete
             coronas[c].bateria -= eTX*coronas[c].nodos
             paquetes += coronas[c].nodos
-        else:
-            coronas[c].bateria -= saludoRx*coronas[c-1].nodos
+        elif c == len(coronas)-1:
+            # Cada nodo de la corona 'c' envía un Hello
             coronas[c].bateria -= saludoTx*coronas[c].nodos
-            coronas[c].bateria -= eRX*coronas[c-1].nodos
+            # Estos Hello se escuchan en la corona c-1
+            coronas[c-1].bateria -= saludoRx*coronas[c].nodos
+            # En la corona 'c' se escuchan los Hello de la corona c-1
+            coronas[c].bateria -= saludoRx*coronas[c].nodos
+            # Cada nodo de la corona 'c' envía un paquete
             coronas[c].bateria -= eTX*coronas[c].nodos
+            # Estos paquetes se escuchan en la corona c-1
+            coronas[c-1].bateria -= eRX*coronas[c].nodos
+            # En la corona 'c' se escuchan los paquetes de la corona c-1
+            coronas[c].bateria -= eRX*coronas[c].nodos
+            paquetes += coronas[c].nodos - coronas[c-1].nodos
+        else:
+            # Cada nodo de la corona 'c' envía un Hello
+            coronas[c].bateria -= saludoTx*coronas[c].nodos
+            # Estos Hello se escuchan en las coronas c-1 y c+1
+            coronas[c-1].bateria -= saludoRx*coronas[c].nodos
+            coronas[c+1].bateria -= saludoRx*coronas[c+1].nodos
+            # En la corona 'c' se escuchan los Hello de las coronas c+1 y c-1
+            coronas[c].bateria -= saludoRx*coronas[c].nodos + saludoRx*coronas[c+1].nodos
+            # Cada nodo de la corona 'c' envía un paquete
+            coronas[c].bateria -= eTX*coronas[c].nodos
+            # Estos paquetes se escuchan en las coronas c-1 y c+1
+            coronas[c-1].bateria -= eRX*coronas[c].nodos
+            coronas[c+1].bateria -= eRX*coronas[c+1].nodos
+            # En la corona 'c' se escuchan los paquetes de las coronas c+1 y c-1
+            coronas[c].bateria -= eRX*coronas[c].nodos + eRX*coronas[c+1].nodos
             paquetes += coronas[c].nodos - coronas[c-1].nodos
     
     contador = 0
