@@ -21,11 +21,6 @@ class Corona:
 for n in n_nodos:
     coronas.append(Corona(n))
 
-suma = 0
-for corona in coronas:
-    suma += corona.bateria
-print(suma)
-
 def ciclo():
     global paquetes
     global condicion
